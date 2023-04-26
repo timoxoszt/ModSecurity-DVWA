@@ -1,0 +1,16 @@
+version: "3.6"
+services:
+    dvwa:
+        build: ./dvwa
+        restart: unless-stopped
+        volumes:
+          - ./dvwa/logs/:/var/log/apache2/
+        ports:
+          - 8500:80
+    nginx:
+        build: ./nginx
+        restart: unless-stopped
+        volumes:
+          - ./nginx/logs/:/var/log/nginx/
+        ports:
+          - 8600:80 # nginx proxy
