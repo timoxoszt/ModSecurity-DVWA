@@ -1,103 +1,50 @@
-ARG NGINX_VER=1.23.3
+# References:
+# - How to implement ModSecurity WAF with NGINX: https://medium.com/building-goalwise/how-to-implement-modsecurity-waf-with-nginx-15fdd42fa3
+# - Compiling NGINX module as dynamic module for use in docker: https://gist.github.com/hermanbanken/96f0ff298c162a522ddbba44cad31081
+# - Stackoverflow & Google for solving many errors
 
-FROM nginx:${NGINX_VER}-alpine as base
+FROM nginx:1.16.1-alpine
 
-ARG GEO_DB_RELEASE=2023-03
-ARG MODSEC_TAG=v3.0.8
-ARG OWASP_TAG=v3.3.4
+# Add dependencies
+RUN apk add git \
+  gcc \
+  g++ \
+  make \
+  automake \
+  curl \
+  autoconf \
+  libtool \
+  pcre \
+  pcre-dev \
+  libxml2 \
+  libxml2-dev \
+  linux-headers
 
-WORKDIR /opt
+# Compiling modsecurity code
+RUN git clone --depth 1 -b v3/master --single-branch https://github.com/SpiderLabs/ModSecurity && \
+  cd ModSecurity && \
+  git submodule init && \
+  git submodule update && \
+  ./build.sh && \
+  ./configure && \
+  make && \
+  make install
 
-# Install dependencies; includes dependencies required for compile-time options:
-# curl, libxml, pcre, and lmdb and Modsec
-RUN echo "Installing Dependencies" && \
-    apk add --no-cache --virtual general-dependencies \
-    autoconf \
-    automake \
-    byacc \
-    curl-dev \
-    flex \
-    g++ \
-    gcc \
-    geoip-dev \
-    git \
-    libc-dev \
-    libmaxminddb-dev \
-    libstdc++ \
-    libtool \
-    libxml2-dev \
-    linux-headers \
-    lmdb-dev \
-    make \
-    openssl-dev \
-    pcre-dev \
-    yajl-dev \
-    zlib-dev
+# Compiling modsecurity connector for nginx
+RUN ORIGINAL_CONFIG=$(nginx -V 2>&1 | sed -n -e 's/^.*arguments: //p') \
+  git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git && \
+  wget "http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" -O nginx.tar.gz && \
+  tar -xvzmf nginx.tar.gz && \
+  cd "nginx-${NGINX_VERSION}" && \
+  ./configure --with-compat $ORIGINAL_CONFIG --add-dynamic-module=../ModSecurity-nginx && \
+  make modules && \
+  cp objs/ngx_http_modsecurity_module.so /etc/nginx/modules
 
-# Clone and compile modsecurity. Binary will be located in /usr/local/modsecurity
-RUN echo "Installing ModSec Library" && \
-    git clone -b ${MODSEC_TAG} --depth 1 https://github.com/SpiderLabs/ModSecurity.git && \
-    git -C /opt/ModSecurity submodule update --init --recursive && \
-    (cd "/opt/ModSecurity" && \
-        ./build.sh && \
-        ./configure --with-lmdb && \
-        make && \
-        make install \
-    ) && \
-    rm -fr /opt/ModSecurity \
-        /usr/local/modsecurity/lib/libmodsecurity.a \
-        /usr/local/modsecurity/lib/libmodsecurity.la
+# Add config files
+RUN rm -rf /etc/nginx/nginx.conf /etc/nginx/conf.d
+COPY conf /etc/nginx/
 
-# Clone Modsec Nginx Connector, GeoIP, ModSec OWASP Rules, and download/extract nginx and GeoIP databases
-RUN echo 'Cloning Modsec Nginx Connector, GeoIP, ModSec OWASP Rules, and download/extract nginx and GeoIP databases' && \
-    git clone -b master --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git && \
-    git clone -b master --depth 1 https://github.com/leev/ngx_http_geoip2_module.git && \
-    git clone -b ${OWASP_TAG} --depth 1 https://github.com/coreruleset/coreruleset.git /usr/local/owasp-modsecurity-crs && \
-    wget -O - https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz | tar -xz && \
-    mkdir -p /etc/nginx/geoip && \
-    wget -O - https://download.db-ip.com/free/dbip-city-lite-${GEO_DB_RELEASE}.mmdb.gz | gzip -d > /etc/nginx/geoip/dbip-city-lite.mmdb && \
-    wget -O - https://download.db-ip.com/free/dbip-country-lite-${GEO_DB_RELEASE}.mmdb.gz | gzip -d > /etc/nginx/geoip/dbip-country-lite.mmdb
-
-# Install GeoIP2 and ModSecurity Nginx modules
-RUN echo 'Installing Nginx Modules' && \
-    (cd "/opt/nginx-$NGINX_VERSION" && \
-        ./configure --with-compat \
-            --add-dynamic-module=../ModSecurity-nginx \
-            --add-dynamic-module=../ngx_http_geoip2_module && \
-        make modules \
-    ) && \
-    cp /opt/nginx-$NGINX_VERSION/objs/ngx_http_modsecurity_module.so \
-        /opt/nginx-$NGINX_VERSION/objs/ngx_http_geoip2_module.so \
-        /usr/lib/nginx/modules/ && \
-    rm -fr /opt/* && \
-    apk del general-dependencies
-
-
-FROM nginx:${NGINX_VER}-alpine as production
-
-# Copy nginx, owasp-modsecurity-crs, and modsecurity from the build image
-COPY --from=base /etc/nginx/ /etc/nginx/
-COPY --from=base /usr/local/modsecurity /usr/local/modsecurity
-COPY --from=base /usr/local/owasp-modsecurity-crs /usr/local/owasp-modsecurity-crs
-COPY --from=base /usr/lib/nginx/modules/ /usr/lib/nginx/modules/
-
-# Copy local config files into the image
-COPY errors /usr/share/nginx/errors
-COPY conf/nginx/ /etc/nginx/
-COPY conf/modsec/ /etc/nginx/modsec/
-COPY conf/owasp/ /usr/local/owasp-modsecurity-crs/
-
-RUN apk add --no-cache \
-    curl-dev \
-    libmaxminddb-dev \
-    libstdc++ \
-    libxml2-dev \
-    lmdb-dev \
-    pcre \
-    tzdata \
-    yajl && \
-    chown -R nginx:nginx /usr/share/nginx
-
-WORKDIR /usr/share/nginx/html
-
-EXPOSE 80 443
+# Configuration for when starting the container
+WORKDIR /etc/nginx/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
