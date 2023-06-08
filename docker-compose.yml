@@ -7,11 +7,12 @@ services:
           - ./dvwa/logs/:/var/log/apache2/
         ports:
           - 8500:80
-    nginx:
-      build: ./nginx
-      ports:
-        - 8088:80
-      volumes:
-        - ./nginx/conf/conf.d/default.conf:/etc/nginx/conf.d/default.conf
-        - ./nginx/conf/modsec/:/etc/nginx/modsec/
-        - ./nginx/logs/:/var/log/nginx/
+          - 127.0.0.1:8600:80 # for nginx proxy
+    # nginx:
+    #   build: ./nginx
+    #   ports:
+    #     - 8088:80
+    #   volumes:
+    #     - ./nginx/conf/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    #     - ./nginx/conf/modsec/:/etc/nginx/modsec/
+    #     - ./nginx/logs/:/var/log/nginx/
