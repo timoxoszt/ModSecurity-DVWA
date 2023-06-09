@@ -1,0 +1,12 @@
+server {
+    listen      80;
+    listen      [::]:80;
+    server_name f1301.local;
+
+    location / {
+        modsecurity on;
+        modsecurity_rules_file /etc/nginx/modsec/main.conf;
+        # Recall: this domain only works under docker-compose
+        proxy_pass http://127.0.0.1:8600;
+    }
+}
