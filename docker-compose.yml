@@ -5,6 +5,8 @@ services:
         restart: unless-stopped
         volumes:
           - ./dvwa/logs/:/var/log/apache2/
+          - ./dvwa/php/php.ini:/etc/php/7.0/apache2/php.ini
+          - ./dvwa/config/config.inc.php:/var/www/html/config/config.inc.php
         ports:
           - 8500:80
           - 127.0.0.1:8600:80 # for nginx proxy
