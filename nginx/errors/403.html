@@ -1,73 +1,96 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>403 Error</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600"
-      media="screen"
-      rel="stylesheet"
-    />
-  </head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403</title>
   <style>
-    html,
+    @import url(https://fonts.googleapis.com/css?family=Raleway:700);
+    *, *:before, *:after {
+      box-sizing: border-box;
+    }
+    html {
+        height: 100%;
+    }
     body {
-      background: rgba(178, 177, 184, 1);
-      color: rgba(255, 255, 255, 1);
-      font-family: "Source Sans Pro", sans-serif;
-      height: 100%;
-      overflow-y: hidden;
-      overflow-x: hidden;
+        font-family: 'Raleway', sans-serif;
+        background-color: #342643; 
+        height: 100%;
+        padding: 10px;
     }
 
-    #flex-container {
-      align-items: center;
+    a {
+      color: #EE4B5E !important;
+      text-decoration:none;
+    }
+    a:hover {
+      color: #FFFFFF !important;
+      text-decoration:none;
+    }
+
+    .text-wrapper {
+        height: 100%;
       display: flex;
-      min-height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    #flex-item {
-      animation: load 1s ease forwards;
-      flex-basis: 400px;
+    .title {
+        font-size: 5em;
+        font-weight: 700;
+        color: #EE4B5E;
     }
 
-    h1 {
-      color: rgba(74, 73, 77, 1);
-      font-size: 3rem;
-      line-height: 4rem;
-      margin-bottom: 1rem;
+    .subtitle {
+        font-size: 40px;
+        font-weight: 700;
+        color: #1FA9D6;
     }
-
-    hr {
-      background-color: rgba(255, 255, 255, 0.3);
-      border: none;
-      height: 1px;
+    .isi {
+        font-size: 18px;
+        text-align: center;
+        margin:30px;
+        padding:20px;
+        color: white;
     }
-
-    @keyframes load {
-      0% {
-        opacity: 0;
-      }
-
-      100% {
-        padding-left: 4rem;
-        opacity: 1;
-      }
-    }
-
-    #subheader {
-      font-size: 2rem;
-      line-height: 2rem;
-    }
+    .buttons {
+        margin: 30px;
+            font-weight: 700;
+            border: 2px solid #EE4B5E;
+            text-decoration: none;
+            padding: 15px;
+            text-transform: uppercase;
+            color: #EE4B5E;
+            border-radius: 26px;
+            transition: all 0.2s ease-in-out;
+            display: inline-block;
+            
+            .buttons:hover {
+                background-color: #EE4B5E;
+                color: white;
+                transition: all 0.2s ease-in-out;
+            }
+      }    
   </style>
-  <body>
-    <div id="flex-container">
-      <div id="flex-item">
-        <h1>403</h1>
-        <p id="subheader">Sorry, this is not allowed.</p>
-        <hr />
-        <p>You may want to head back to the homepage.</p>
-      </div>
-    </div>
-  </body>
+</head>
+<body>
+  
+</body>
 </html>
+<div class="text-wrapper">
+  <div class="title" data-content="404">
+    403 - ACCESS DENIED
+  </div>
+
+  <div class="subtitle">
+      Dừng lại !!! Bạn không có quyền truy cập vào trang web này.
+  </div>
+  <div class="isi">
+    Nếu bạn cho rằng đây là lỗi, hãy liên hệ cho chúng tôi tại admin@f1301.cyou
+  </div>
+
+  <div class="buttons">
+      <a class="button" href="/">Trở về trang chủ</a>
+  </div>
+</div>
