@@ -18,12 +18,22 @@ LFI:
 ../../../../var/log/syslog
 ../../../../var/www/html/index.php%00
 
-Brutforce:
-URL:
-http://192.168.159.141/vulnerabilities/brute/?username=ez&password=ez&Login=Login#
-User: admin
-Cookie:
-PHPSESSID=143e07aa75cb79d4a867861ce10d15ea
-security=low
-
-
+Phishing:
+c54c54.com
+vuidinhcao.com
+dangkyvay-bank247.net
+codetruykich.com
+smartphonegiatot.com
+redpillvn.com
+sin88.com
+dongho-thuysi.com
+hethongdienthoaiviet.com
+khodidongchinhhang.com
+smartphonecaocap.com
+thegioisoa93.com
+xakhogiovanga92.com
+napgame3s.com
+cpctvn.com
+ngohoangdu.com
+zingspeedmobile.com
+fxtradingmarkets.com
